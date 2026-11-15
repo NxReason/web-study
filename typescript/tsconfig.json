@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "noEmitOnError": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
+  "files": [
+    "basics.ts"
+  ]
+}
