@@ -7,14 +7,14 @@ async function run() {
     return text.toUpperCase();
   }
   await stream.pipeline(
-    fs.createReadStream('lowercase.txt'),
+    fs.createReadStream('texts/lowercase.txt'),
     async function* (source, { signal }) {
       source.setEncoding('utf-8'); // work with strings other buffers
       for await (const chunk of source) {
         yield await processChunk(chunk, { signal });
       }
     },
-    fs.createWriteStream('uppercase.txt'),
+    fs.createWriteStream('texts/uppercase.txt'),
   );
   console.log('Pipeline succeeded');
 
@@ -39,7 +39,7 @@ await run();
 // problem set
 // 1
 function readFile() {
-  const rs = fs.createReadStream('lowercase.txt');
+  const rs = fs.createReadStream('texts/lowercase.txt');
 
   let totalSize = 0;
   rs.on('data', chunk => {
@@ -55,7 +55,7 @@ function readFile() {
   });
 }
 function readFile2() {
-  const rs = fs.createReadStream('lowercase.txt', { encoding: 'utf-8' });
+  const rs = fs.createReadStream('texts/lowercase.txt', { encoding: 'utf-8' });
 
   let totalChars = 0;
   rs.on('data', chunk => {
@@ -74,8 +74,8 @@ readFile();
 readFile2();
 
 async function copyFile() {
-  const rs = fs.createReadStream('lowercase.txt');
-  const ws = fs.createWriteStream('lowercase-copy.txt');
+  const rs = fs.createReadStream('texts/lowercase.txt');
+  const ws = fs.createWriteStream('texts/lowercase-copy.txt');
 
   rs.pipe(ws);
 
@@ -86,7 +86,7 @@ async function copyFile() {
 await copyFile();
 
 async function transformText() {
-  const rs = fs.createReadStream('lowercase.txt');
+  const rs = fs.createReadStream('texts/lowercase.txt');
 
   let totalSize = 0;
   const transform = new Transform({
@@ -119,10 +119,59 @@ async function transformText() {
     },
   });
 
-  const ws = fs.createWriteStream('lowercase-transformed.txt');
+  const ws = fs.createWriteStream('texts/lowercase-transformed.txt');
 
   await pipeline(rs, whiteSpaceShrink, transform, ws);
   console.log('transformed, total size: ', totalSize);
 }
 
 await transformText();
+
+async function splitFile() {
+  const CHUNK_SIZE = 16;
+  const rs = fs.createReadStream('texts/lowercase.txt', { highWaterMark: 5 });
+
+  let index = 0;
+  let bytesWritten = 0;
+  let ws = fs.createWriteStream(`texts/lowercase-chunked-${index}.txt`);
+  for await (const chunk of rs) {
+    if (chunk.length + bytesWritten <= CHUNK_SIZE) {
+      ws.write(chunk);
+      bytesWritten += chunk.length;
+      continue;
+    }
+
+    const bytesLeft = CHUNK_SIZE - bytesWritten;
+    ws.write(chunk.subarray(0, bytesLeft));
+    ws.end();
+
+    await finished(ws);
+
+    index++;
+    bytesWritten = chunk.length - bytesLeft;
+    ws = fs.createWriteStream(`texts/lowercase-chunked-${index}.txt`);
+    ws.write(chunk.subarray(bytesLeft));
+  }
+  ws.end();
+  await finished(ws);
+
+  // rs.on('data', chunk => {
+  //   if (chunk.length + bytesWritten <= CHUNK_SIZE) {
+  //     ws.write(chunk);
+  //     bytesWritten += chunk.length;
+  //     return;
+  //   }
+
+  //   const bytesLeft = CHUNK_SIZE - bytesWritten;
+  //   ws.write(chunk.subarray(0, bytesLeft));
+  //   ws.end();
+
+  //   index++;
+  //   bytesWritten = chunk.length - bytesLeft;
+  //   ws = fs.createWriteStream(`texts/lowercase-chunked-${index}.txt`);
+  //   ws.write(chunk.subarray(bytesLeft));
+  // });
+  // ws.end();
+}
+
+await splitFile();
