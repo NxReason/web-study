@@ -1,0 +1,21 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+:root {
+  font: 16px monospace;
+  background-color: #202020;
+  color: #fefefe;
+}
+
+.header {
+  padding: 16px;
+}
+
+.canvas-section {
+  padding: 0 16px 16px;
+}
+.main-canvas {
+  background-color: #111;
+}
