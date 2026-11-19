@@ -7,11 +7,23 @@
 :root {
   background-color: #222;
   color: #fefefe;
+  font-family: monospace;
 }
 
 .wrapper {
   padding: 32px;
+  position: relative;
 }
 .canvas {
   background-color: #111;
+}
+
+.canvas-header {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+
+  font-size: 2rem;
+  text-align: center;
 }
