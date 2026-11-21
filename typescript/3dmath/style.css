@@ -1,0 +1,23 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  background-color: #151515;
+  color: #fdfdfd;
+  font: 16px monospace;
+}
+
+.title {
+  padding: 16px;
+}
+
+.canvas-wrapper {
+  padding: 0 16px 16px;
+}
+
+.main-canvas {
+  background-color: #222;
+}
