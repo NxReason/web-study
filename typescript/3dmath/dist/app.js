@@ -1,6 +1,8 @@
 import Triangle from './shapes/Triangle.js';
 import Vector3 from './math/Vector3.js';
 import * as vm from './math/vecmath.js';
+import * as mm from './math/matrixmath.js';
+import Mat4 from './math/Matrix.js';
 const canvas = document.getElementById('main-canvas');
 const context = canvas.getContext('2d');
 const triangle = new Triangle(new Vector3(100, 100), new Vector3(500, 500), new Vector3(900, 100));
@@ -11,6 +13,17 @@ const v = new Vector3(60, 40);
 console.log(vm.proj(v, xAxis));
 console.log(vm.perp(v, xAxis));
 console.log(vm.cross(yAxis, v));
+const mat = new Mat4(makeRange(0, 16));
+const trans = mm.transpose(mat);
+mat.pretty();
+trans.pretty();
+function makeRange(from, to) {
+    const arr = new Array(to - from);
+    for (let i = 0; i < arr.length; i++) {
+        arr[i] = i + from;
+    }
+    return arr;
+}
 // const padding = 50;
 // const axisOrigin = new Vector3(padding, bounds.height - padding);
 // const yAxis: Line = new Line(new Vector3(padding, padding), axisOrigin);
